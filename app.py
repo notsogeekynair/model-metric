@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template, request
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,7 +8,8 @@ import base64
 import logging
 
 app = Flask(__name__)
-
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
