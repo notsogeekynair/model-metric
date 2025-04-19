@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-6 max-w-6xl">
+        <div class="flex justify-end mb-4">
+            <button id="dark-mode-toggle" class="btn-primary text-white p-2 rounded">Toggle Dark Mode</button>
+        </div>
+        <div class="card p-8 animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Model Metrics Comparison Results</h1>
+
+            {% for dataset in datasets %}
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">{{ dataset }} Metrics</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse mb-6">
+                        <thead>
+                            <tr>
+                                <th class="p-3">Model</th>
+                                <th class="p-3">TP (Yes)</th>
+                                <th class="p-3">FN (Yes)</th>
+                                <th class="p-3">FP (Yes)</th>
+                                <th class="p-3">TN (Yes)</th>
+                                <th class="p-3">TP (No)</th>
+                                <th class="p-3">FN (No)</th>
+                                <th class="p-3">FP (No)</th>
+                                <th class="p-3">TN (No)</th>
+                                {% for metric in selected_metrics %}
+                                    <th class="p-3">{{ metric.replace('_', ' ').title() }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-600">
+                            {% for model in models_data %}
+                                {% set ds = model.datasets[loop.index0] %}
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-500">
+                                    <td class="p-3 text-gray-800 dark:text-gray-100">{{ model.name }}</td>
+                                    <td class="p-3">{{ ds.yes.tp }}</td>
+                                    <td class="p-3">{{ ds.yes.fn }}</td>
+                                    <td class="p-3">{{ ds.yes.fp }}</td>
+                                    <td class="p-3">{{ ds.yes.tn }}</td>
+                                    <td class="p-3">{{ ds.no.tp }}</td>
+                                    <td class="p-3">{{ ds.no.fn }}</td>
+                                    <td class="p-3">{{ ds.no.fp }}</td>
+                                    <td class="p-3">{{ ds.no.tn }}</td>
+                                    {% for metric in selected_metrics %}
+                                        <td class="p-3">
+                                            {% if metric == 'accuracy' %}
+                                                {{ "%.4f" % ds.metrics.accuracy if ds.metrics.accuracy is defined else 'N/A' }}
+                                            {% elif metric.endswith('_yes') %}
+                                                {{ "%.4f" % ds.metrics.yes[metric.split('_')[0]] if ds.metrics.yes[metric.split('_')[0]] is defined else 'N/A' }}
+                                            {% elif metric.endswith('_no') %}
+                                                {{ "%.4f" % ds.metrics.no[metric.split('_')[0]] if ds.metrics.no[metric.split('_')[0]] is defined else 'N/A' }}
+                                            {% else %}
+                                                {{ 'N/A' }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Metric Plots</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for metric, plot in plots.items() %}
+                    <div class="card p-4 animate__animated animate__fadeInUp">
+                        <h3 class="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">{{ metric.replace('_', ' ').title() }}</h3>
+                        <img src="data:image/png;base64,{{ plot }}" alt="{{ metric }} plot" class="w-full rounded-lg">
+                    </div>
+                {% endfor %}
+            </div>
+
+            <a href="/" class="btn-primary text-white p-3 w-full block text-center mt-6">Back to Input</a>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode toggle
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        });
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+        }
+    </script>
+</body>
+</html>

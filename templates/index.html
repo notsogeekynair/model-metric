@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Metrics Comparison</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-6 max-w-4xl">
+        <div class="flex justify-end mb-4">
+            <button id="dark-mode-toggle" class="btn-primary text-white p-2 rounded">Toggle Dark Mode</button>
+        </div>
+        <div class="card p-8 animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Model Metrics Comparison</h1>
+
+            {% if error %}
+                <p class="text-red-500 bg-red-100 dark:bg-red-900 dark:text-red-200 p-3 rounded-lg mb-4 animate__animated animate__shakeX">{{ error }}</p>
+            {% endif %}
+
+            <form method="POST" class="space-y-6" onsubmit="showSpinner()">
+                <div class="flex items-center space-x-4">
+                    <label for="num_models" class="text-gray-700 dark:text-gray-200 font-medium">Number of Models:</label>
+                    <input type="number" id="num_models" name="num_models" min="1" value="2" class="border p-2 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <label for="num_datasets" class="text-gray-700 dark:text-gray-200 font-medium">Number of Datasets:</label>
+                    <input type="number" id="num_datasets" name="num_datasets" min="1" value="2" class="border p-2 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                </div>
+                <button type="button" onclick="generateInputs()" class="btn-primary text-white p-3 w-full">Generate Inputs</button>
+
+                <div id="dataset-inputs" class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <label class="text-gray-700 dark:text-gray-200">Dataset 1 Name:</label>
+                        <input type="text" name="dataset_name_0" value="Dataset A" class="border p-3 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" placeholder="Dataset 1">
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <label class="text-gray-700 dark:text-gray-200">Dataset 2 Name:</label>
+                        <input type="text" name="dataset_name_1" value="Dataset B" class="border p-3 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" placeholder="Dataset 2">
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Select Metrics</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="accuracy" class="mr-2" checked> Accuracy
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="tpr_yes" class="mr-2" checked> TPR (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="tnr_yes" class="mr-2"> TNR (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="fpr_yes" class="mr-2"> FPR (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="fnr_yes" class="mr-2"> FNR (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="ppv_yes" class="mr-2"> PPV (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="f1_yes" class="mr-2" checked> F1 (Yes)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="tpr_no" class="mr-2" checked> TPR (No)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="tnr_no" class="mr-2"> TNR (No)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="fpr_no" class="mr-2"> FPR (No)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="fnr_no" class="mr-2"> FNR (No)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="ppv_no" class="mr-2"> PPV (No)
+                        </label>
+                        <label class="flex items-center text-gray-700 dark:text-gray-200">
+                            <input type="checkbox" name="metrics" value="f1_no" class="mr-2" checked> F1 (No)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <label for="plot_type" class="text-gray-700 dark:text-gray-200 font-medium">Plot Type:</label>
+                    <select id="plot_type" name="plot_type" class="border p-2 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200">
+                        <option value="bar">Bar</option>
+                        <option value="line" selected>Line</option>
+                    </select>
+                </div>
+
+                <div id="model-inputs" class="space-y-6"></div>
+                <button type="submit" class="btn-primary text-white p-3 w-full">Calculate Metrics</button>
+            </form>
+        </div>
+    </div>
+    <div id="spinner"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+    <script>
+        // Dark mode toggle
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        });
+
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark');
+        }
+
+        // Spinner
+        function showSpinner() {
+            const spinner = new Spin.Spinner({ lines: 12, length: 20, width: 10, radius: 30, color: '#3b82f6' }).spin();
+            document.getElementById('spinner').appendChild(spinner.el);
+            document.getElementById('spinner').style.display = 'block';
+        }
+
+        // Default confusion matrix values
+        const defaultValues = [
+            // Model 1 (Random Forest)
+            [
+                // Dataset A
+                { yes: { tp: 80, fn: 20, fp: 10, tn: 90 }, no: { tp: 85, fn: 15, fp: 5, tn: 95 } },
+                // Dataset B
+                { yes: { tp: 70, fn: 30, fp: 15, tn: 85 }, no: { tp: 75, fn: 25, fp: 10, tn: 90 } }
+            ],
+            // Model 2 (SVM)
+            [
+                // Dataset A
+                { yes: { tp: 75, fn: 25, fp: 15, tn: 85 }, no: { tp: 80, fn: 20, fp: 10, tn: 90 } },
+                // Dataset B
+                { yes: { tp: 65, fn: 35, fp: 20, tn: 80 }, no: { tp: 70, fn: 30, fp: 15, tn: 85 } }
+            ]
+        ];
+
+        // Generate inputs
+        function generateInputs() {
+            const numModels = parseInt(document.getElementById('num_models').value);
+            const numDatasets = parseInt(document.getElementById('num_datasets').value);
+            const datasetContainer = document.getElementById('dataset-inputs');
+            const modelContainer = document.getElementById('model-inputs');
+            datasetContainer.innerHTML = '';
+            modelContainer.innerHTML = '';
+
+            const models = [
+                'Logistic Regression', 'Random Forest', 'SVM', 'Neural Network', 'Decision Tree', 'XGBoost', 'Custom'
+            ];
+
+            // Dataset inputs
+            for (let j = 0; j < numDatasets; j++) {
+                datasetContainer.innerHTML += `
+                    <div class="flex items-center space-x-4">
+                        <label class="text-gray-700 dark:text-gray-200">Dataset ${j + 1} Name:</label>
+                        <input type="text" name="dataset_name_${j}" value="Dataset ${String.fromCharCode(65 + j)}" class="border p-3 flex-1 focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" placeholder="Dataset ${j + 1}">
+                    </div>
+                `;
+            }
+
+            // Model inputs
+            for (let i = 0; i < numModels; i++) {
+                let modelHtml = `
+                    <div class="card p-6 animate__animated animate__fadeInUp">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Model ${i + 1}</h2>
+                        <div class="mb-4">
+                            <label class="block mb-1 text-gray-700 dark:text-gray-200">Model Name:</label>
+                            <select name="model_name_${i}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" onchange="toggleCustomName(${i})">
+                                ${models.map(model => `<option value="${model}" ${model === (i === 0 ? 'Random Forest' : 'SVM') ? 'selected' : ''}>${model}</option>`).join('')}
+                            </select>
+                            <input type="text" name="custom_model_name_${i}" id="custom_model_name_${i}" class="border p-3 w-full mt-2 hidden focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" placeholder="Enter custom model name">
+                        </div>
+                `;
+
+                for (let j = 0; j < numDatasets; j++) {
+                    const defaults = defaultValues[i] && defaultValues[i][j] ? defaultValues[i][j] : { yes: { tp: 0, fn: 0, fp: 0, tn: 0 }, no: { tp: 0, fn: 0, fp: 0, tn: 0 } };
+                    modelHtml += `
+                        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">Dataset ${j + 1}</h3>
+                        <div class="mb-4">
+                            <h4 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-2">Yes Class</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">True Positives (TP):</label>
+                                    <input type="number" name="tp_yes_${i}_${j}" min="0" value="${defaults.yes.tp}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">False Negatives (FN):</label>
+                                    <input type="number" name="fn_yes_${i}_${j}" min="0" value="${defaults.yes.fn}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">False Positives (FP):</label>
+                                    <input type="number" name="fp_yes_${i}_${j}" min="0" value="${defaults.yes.fp}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">True Negatives (TN):</label>
+                                    <input type="number" name="tn_yes_${i}_${j}" min="0" value="${defaults.yes.tn}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-md font-medium text-gray-700 dark:text-gray-200 mb-2">No Class</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">True Positives (TP):</label>
+                                    <input type="number" name="tp_no_${i}_${j}" min="0" value="${defaults.no.tp}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">False Negatives (FN):</label>
+                                    <input type="number" name="fn_no_${i}_${j}" min="0" value="${defaults.no.fn}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">False Positives (FP):</label>
+                                    <input type="number" name="fp_no_${i}_${j}" min="0" value="${defaults.no.fp}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                                <div>
+                                    <label class="block mb-1 text-gray-700 dark:text-gray-200">True Negatives (TN):</label>
+                                    <input type="number" name="tn_no_${i}_${j}" min="0" value="${defaults.no.tn}" class="border p-3 w-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-gray-200" required>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                modelHtml += `</div>`;
+                modelContainer.innerHTML += modelHtml;
+            }
+        }
+
+        // Auto-generate inputs on page load
+        window.onload = generateInputs;
+
+        function toggleCustomName(index) {
+            const select = document.getElementsByName(`model_name_${index}`)[0];
+            const customInput = document.getElementById(`custom_model_name_${index}`);
+            customInput.classList.toggle('hidden', select.value !== 'Custom');
+        }
+
+        // Client-side validation
+        document.querySelector('form').addEventListener('submit', (e) => {
+            const inputs = document.querySelectorAll('input[type="number"]');
+            for (let input of inputs) {
+                if (input.value < 0) {
+                    e.preventDefault();
+                    alert('Please enter non-negative numbers for confusion matrix values.');
+                    document.getElementById('spinner').style.display = 'none';
+                    return;
+                }
+            }
+            const metricCheckboxes = document.querySelectorAll('input[name="metrics"]:checked');
+            if (metricCheckboxes.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one metric.');
+                document.getElementById('spinner').style.display = 'none';
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

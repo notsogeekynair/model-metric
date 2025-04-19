@@ -1,0 +1,85 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    transition: background 0.3s ease;
+}
+
+body.dark {
+    background: linear-gradient(135deg, #1f2937, #374151);
+    color: #e5e7eb;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+body.dark .card {
+    background: #374151;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    border: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: scale(1.05);
+}
+
+body.dark .btn-primary {
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
+}
+
+input, select, button {
+    border-radius: 8px;
+}
+
+body.dark input, body.dark select {
+    background: #4b5563;
+    color: #e5e7eb;
+    border-color: #6b7280;
+}
+
+table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    border: none;
+}
+
+thead {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+}
+
+body.dark thead {
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
+}
+
+body.dark tbody {
+    background: #4b5563;
+}
+
+body.dark tr:hover {
+    background: #6b7280;
+}
+
+#spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
